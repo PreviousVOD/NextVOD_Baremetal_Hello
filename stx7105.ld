@@ -2,13 +2,13 @@
 HEAP_SIZE  = 0x10000;
 STACK_SIZE = 0x10000;
 
-ENTRY(_start)
+ENTRY(start)
 
-/* For bare-metal applications, we use 29-bit addressing mode. */
+/* We don't use 29-bit mode since PMB and LMI initialization has to be done anyway. */
 
 MEMORY {
-    EMI  (rx) : ORIGIN = 0x00000000, LENGTH = 0x00100000 /* EMI physical address: 0x0000_0000 */
-    LMI (rwx) : ORIGIN = 0x0C000000, LENGTH = 0x10000000 /* LMI physical address: 0x0C00_0000 */
+    EMI  (rx) : ORIGIN = 0xA0000000, LENGTH = 0x00100000 /* EMI virtual address: 0xA000_0000 */
+    LMI (rwx) : ORIGIN = 0x80000000, LENGTH = 0x10000000 /* LMI virtual address: 0x8000_0000 */
 }
 
 SECTIONS {

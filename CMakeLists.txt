@@ -9,6 +9,7 @@ set(TARGET_LDSCRIPT "${CMAKE_SOURCE_DIR}/stx7105.ld")
 set(TARGET_SOURCES
     "src/main.c"
     "startup_stx7105.S"
+    "startup_stx7105_init_ram.S"
 )
 
 set(TARGET_INCLUDES
