@@ -19,6 +19,7 @@ SECTIONS {
         *(.text*)
         *(.rodata)
         *(.rodata*)
+        . = ALIGN(4);
     } >EMI
 
     .data : {

@@ -34,6 +34,11 @@ _start:
     ldc r0, sr
     mov.l _stack_k, sp /* Setup R15(SP) */
 
+_disable_wdt:
+    mov.l _cpg_wdt_wtcsr_k, r0
+    mov.l _cpg_wdt_wtcsr_value_k, r1
+    mov.w r1, @r0
+
 _configure_spinor:
     mov.l _emi_spinor_config_data_k, r0
     mov.l _emi_spinor_config_data_value_k, r1
@@ -154,18 +159,7 @@ _copy_data:
     mov.l _edata_k, r2
 
 _loop_copy_data:
-/* Turn on Red LED */
-    mov #32, r7
-    mov.l _gpio_set_k, r8
-    mov.l r7, @r8
-
     mov.l @r0+, r3 /* Load a word to r3 from [sidata], with post-increment of 4 */
-
-/* Turn on Blue LED */
-    mov #16, r7
-    mov.l _gpio_set_k, r8
-    mov.l r7, @r8
-
     mov.l r3, @r1  /* Store the word in r3 to [sdata] */
     add #4, r1     /* Increment sdata pointer */
     cmp/ge r1, r2
@@ -182,12 +176,23 @@ _loop_zero_bss:
     cmp/ge r0, r1
     bt _loop_zero_bss
 
+/* Turn on Blue LED */
+    mov #16, r7
+    mov.l _gpio_set_k, r8
+    mov.l r7, @r8
+
 _setup_fpu:
     mov.l _set_fpscr_k, r1
     jsr @r1
     mov #0, r4
     lds r3, fpscr
 
+/* Turn on Red LED */
+    mov #32, r7
+    mov.l _gpio_set_k, r8
+    mov.l r7, @r8
+
+_main_entry:
     mov.l _main_k, r0
     jsr @r0
     or r0, r0
@@ -250,6 +255,12 @@ _ccn_pascr_value_k:
 /* SR content */
 _sr_k:
     .long 0x400000F0
+
+/* WDT */
+_cpg_wdt_wtcsr_k:
+    .long 0xFFC0000C
+_cpg_wdt_wtcsr_value_k:
+    .long 0x0000A500
 
 /* EMI SPI NOR configuration registers */
 _emi_spinor_config_data_k:
