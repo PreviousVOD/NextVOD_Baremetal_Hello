@@ -18,7 +18,7 @@
 #define LED_BLUE_PIN 5U
 
 static void init_led(uint8_t pin) {
-    *(uint32_t *)(ST_GPIO0_BASE_ADDR + ST_GPIO0_OFFSET_SET_PC0) = (1 << pin);
+    *(uint32_t *)(ST_GPIO0_BASE_ADDR + ST_GPIO0_OFFSET_CLR_PC0) = (1 << pin);
     *(uint32_t *)(ST_GPIO0_BASE_ADDR + ST_GPIO0_OFFSET_SET_PC1) = (1 << pin);
     *(uint32_t *)(ST_GPIO0_BASE_ADDR + ST_GPIO0_OFFSET_CLR_PC2) = (1 << pin);
 }
@@ -32,14 +32,27 @@ static void set_led(uint8_t pin, uint8_t val) {
     }
 }
 
+static void delay(uint32_t msec) {
+    volatile uint32_t loop = 0;
+    for (uint32_t i = 0; i < msec; i++) {
+        for (uint32_t j = 0; j < 40000; i++) {
+            loop++;
+        }
+    }
+}
+
 int main(void) {
     init_led(LED_RED_PIN);
     init_led(LED_BLUE_PIN);
 
     set_led(LED_RED_PIN, 1);
-    set_led(LED_BLUE_PIN, 0);
+    set_led(LED_BLUE_PIN, 1);
 
     for (;;) {
         /* Dead loop */
+        set_led(LED_BLUE_PIN, 1);
+        delay(1000);
+        set_led(LED_BLUE_PIN, 0);
+        delay(1000);
     }
 }

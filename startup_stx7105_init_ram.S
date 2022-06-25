@@ -70,9 +70,9 @@ __memory_setup_table_end:
  */
 
     .section .text.init, "ax"
-    .global init_ram
+    .global _memory_setup_init_ram
 
-init_ram:
+_memory_setup_init_ram:
     /* Stash the pr somewhere safe */
     sts    pr, r14
 
@@ -83,14 +83,14 @@ init_ram:
      * To get the poke table into D-cache, we simply read it all.
      */
 
-    mova poke_loop_address, r0    /* R6: &poke_loop() */
+    mova _init_ram_poke_loop_address, r0    /* R6: &poke_loop() */
     mov.l @r0, r6
     add r0, r6
-    mov.l p2_to_p1_mask, r3       /* R3: P2 -> P1 mapping */
+    mov.l _init_ram_p2_to_p1_mask, r3       /* R3: P2 -> P1 mapping */
     and r3, r6                    /* convert to P1 addresses */
-    mov.l data_start_address, r1  /* R1 = start address */
+    mov.l _init_ram_data_start_address, r1  /* R1 = start address */
     add r0, r1
-    mov.l data_end_address, r2    /* R2 = end address */
+    mov.l _init_ram_data_end_address, r2    /* R2 = end address */
     add r0, r2
     and r3, r1                    /* convert to a P1 addresses */
     and r3, r2
@@ -119,10 +119,10 @@ do_pokes:
 
 
     .balign 4
-poke_loop_address:  .long poke_loop - poke_loop_address
-data_start_address: .long __memory_setup_table - poke_loop_address
-data_end_address:   .long __memory_setup_table_end - poke_loop_address
-p2_to_p1_mask:      .long ~0x20000000
+_init_ram_poke_loop_address:  .long _init_ram_poke_loop - _init_ram_poke_loop_address
+_init_ram_data_start_address: .long __memory_setup_table - _init_ram_poke_loop_address
+_init_ram_data_end_address:   .long __memory_setup_table_end - _init_ram_poke_loop_address
+_init_ram_p2_to_p1_mask:      .long ~0x20000000
 
 
 /*
@@ -146,7 +146,7 @@ p2_to_p1_mask:      .long ~0x20000000
  * It is executed from within the I-cache,
  * with all its data in the D-cache
  */
-poke_loop:
+_init_ram_poke_loop:
     mov.l    @r1+, r0    /* opcode */
     mov.l    @r1+, r2    /* address */
     mov.l    @r1+, r3    /* value */
@@ -215,34 +215,34 @@ poke_loop:
     cmp/eq    #9, r0        /* IF_DEVID */
     bf    1f        /* r2 skip offset, r3 condition, r7 holds out cut value */
     cmp/eq    r3, r7
-    bt    poke_loop    /* go ahead with these pokes */
+    bt    _init_ram_poke_loop    /* go ahead with these pokes */
     add    r2, r1
-    bra    poke_loop
+    bra    _init_ram_poke_loop
       nop
 
 1:
     cmp/eq    #10, r0        /* IF_NOT_DEVID */
     bf    1f        /* r2 skip offset, r3 condition, r7 holds out cut value */
     cmp/eq    r3, r7
-    bf    poke_loop    /* go ahead with these pokes */
+    bf    _init_ram_poke_loop    /* go ahead with these pokes */
     add    r2, r1
-    bra    poke_loop
+    bra    _init_ram_poke_loop
       nop
 
 1:    cmp/eq    #11, r0        /* ELSE */
     bf    1f        /* r2 skip offset, r3 condition, r7 holds out cut value */
     add    r2, r1
-    bra    poke_loop
+    bra    _init_ram_poke_loop
       nop
 
 1:
     cmp/eq    #12,r0        /* IF == ... next op */
-    bf    delay
+    bf    _init_ram_delay
     mov.l    @r1+,r5
     mov.l    @r2,r4
     and    r3,r4
     cmp/eq    r4,r5
-    bt    poke_loop    /* Compare succeeded - perform next op */
+    bt    _init_ram_poke_loop    /* Compare succeeded - perform next op */
 
 2:                /* Skip the next operation (read past it) */
     mov.l    @r1+,r0        /* R0 = opcode */
@@ -267,10 +267,10 @@ poke_loop:
 4:
     mov.l    @r1+,r2        /* Skip 1 read and continue */
 5:
-    bra    poke_loop
+    bra    _init_ram_poke_loop
     nop
 
-delay:
+_init_ram_delay:
     mov    #1,r0        /* small delay after EACH opcode */
     swap.w    r0, r0        /* 0x10000 iterations (~65k) */
 
@@ -278,4 +278,4 @@ delay:
     add    #-1,r0
     cmp/eq    #0, r0
     bf    2b
-    bt    poke_loop
+    bt    _init_ram_poke_loop

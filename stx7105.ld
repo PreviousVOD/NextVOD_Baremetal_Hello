@@ -2,7 +2,7 @@
 HEAP_SIZE  = 0x10000;
 STACK_SIZE = 0x10000;
 
-ENTRY(start)
+ENTRY(_start)
 
 /* We don't use 29-bit mode since PMB and LMI initialization has to be done anyway. */
 
