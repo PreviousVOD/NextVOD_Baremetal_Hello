@@ -56,9 +56,9 @@ static void delay_ms(uint32_t msec) {
 }
 
 static void uart_init(void) {
-    PIO4->CLR_PC0 = 1U; /* PC = 110, AFOUT, PP */
-    PIO4->SET_PC1 = 1U;
-    PIO4->SET_PC2 = 1U;
+    // PIO4->CLR_PC0 = 1U; /* PC = 110, AFOUT, PP */
+    // PIO4->SET_PC1 = 1U;
+    // PIO4->SET_PC2 = 1U;
 
     // *(uint32_t *)SYSTEM_CONFIG34 = 0x00000100UL;  /* BIT[8,0] = 10, AF 3 */
     // *(uint32_t *)SYSTEM_CONFIG7 &= ~(0x00000006UL); /* BIT[2:1], UART2 RX SEL */
@@ -78,8 +78,6 @@ int main(void) {
     //     set_led(LED_RED_GPIO, LED_RED_PIN, 1U);
     // }
 
-    *(uint32_t *)SYSTEM_CONFIG34 = 0x00000100UL;  /* BIT[8,0] = 10, AF 3 */
-
     uart_init();
 
     // for (uint16_t i = 0; i < 65534; i++) {
@@ -98,4 +96,6 @@ int main(void) {
         // set_led(LED_BLUE_GPIO, LED_BLUE_PIN, 0);
         // delay_ms(1000);
     }
+
+    return 0;
 }

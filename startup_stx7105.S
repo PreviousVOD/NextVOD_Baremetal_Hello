@@ -30,7 +30,6 @@ _start:
     mov.l r0, @r1
     mov.l _gpio_clr_pc2_k, r1
     mov.l r0, @r1
-
     mov.l _sr_k, r0
     ldc r0, sr
     mov.l _stack_k, sp /* Setup R15(SP) */
@@ -193,6 +192,30 @@ _setup_fpu:
     mov #0, r4
     lds r3, fpscr
 
+/* Try to enable UART from Assembly... */
+    mov.l _system_config_34_k, r0
+    mov.l _system_config_34_value_k, r1
+    mov.l r1, @r0
+
+    mov.l _gpio4_clr_pc0_k, r0
+    mov #1, r1
+    mov.b r1, @r0
+    mov.l _gpio4_set_pc1_k, r0
+    mov.b r1, @r0
+    mov.l _gpio4_set_pc2_k, r0
+    mov.b r1, @r0
+
+    mov.l _asc2_baud_k, r0
+    mov.l _asc2_baud_value_k, r1
+    mov.l r1, @r0
+    mov.l _asc2_ctrl_k, r0
+    mov.l _asc2_ctrl_value_k, r1
+    mov.l r1, @r0
+    mov.l _asc2_tx_buf_k, r0
+    mov #65, r1
+    mov.b r1, @r0
+
+
 _main_entry:
     mov.l _main_k, r0
     jsr @r0
@@ -284,6 +307,27 @@ _gpio_set_pc1_k:
     .long 0xFD020034
 _gpio_clr_pc2_k:
     .long 0xFD020048
+
+_system_config_34_k:
+    .long 0xFE001188
+_system_config_34_value_k:
+    .long 0x00000F00
+_gpio4_clr_pc0_k:
+    .long 0xFD024028
+_gpio4_set_pc1_k:
+    .long 0xFD024034
+_gpio4_set_pc2_k:
+    .long 0xFD024044
+_asc2_baud_k:
+    .long 0xFD032000
+_asc2_baud_value_k:
+    .long 0x000004B8
+_asc2_tx_buf_k:
+    .long 0xFD032004
+_asc2_ctrl_k:
+    .long 0xFD03200C
+_asc2_ctrl_value_k:
+    .long 0x00001589
 
 _crt0_entry:
     .long _copy_data
