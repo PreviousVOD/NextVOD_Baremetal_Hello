@@ -8,6 +8,7 @@ set(TARGET_LDSCRIPT "${CMAKE_SOURCE_DIR}/stx7105.ld")
 
 set(TARGET_SOURCES
     "src/main.c"
+    "src/stx7105_exc.c"
     "startup_stx7105.S"
     "startup_stx7105_init_ram.S"
 )
@@ -16,7 +17,7 @@ set(TARGET_INCLUDES
     "include"
 )
 
-set(TARGET_FLAGS_HARDWARE "-m4-300 -ml")
+set(TARGET_FLAGS_HARDWARE "-m4a -ml")
 
 set(CMAKE_C_FLAGS_DEBUG          "-DDEBUG -g -O0")
 set(CMAKE_CXX_FLAGS_DEBUG        "-DDEBUG -g -O0")
@@ -26,12 +27,12 @@ set(CMAKE_C_FLAGS_RELEASE          "-DNDEBUG -O2 -flto")
 set(CMAKE_CXX_FLAGS_RELEASE        "-DNDEBUG -O2 -flto")
 set(CMAKE_EXE_LINKER_FLAGS_RELEASE "-flto")
 
-set(CMAKE_C_FLAGS          "${TARGET_FLAGS_HARDWARE} -Wall")
-set(CMAKE_CXX_FLAGS        "${TARGET_FLAGS_HARDWARE} -Wall")
-set(CMAKE_EXE_LINKER_FLAGS "${TARGET_FLAGS_HARDWARE} -Wall -lc -lm -nostartfiles -Wl,--print-memory-usage")
+set(CMAKE_C_FLAGS          "${TARGET_FLAGS_HARDWARE} -Wall -ffunction-sections -fdata-sections")
+set(CMAKE_CXX_FLAGS        "${TARGET_FLAGS_HARDWARE} -Wall -ffunction-sections -fdata-sections")
+set(CMAKE_EXE_LINKER_FLAGS "${TARGET_FLAGS_HARDWARE} -Wall -lc -lm -nostartfiles -Wl,--print-memory-usage -Wl,--gc-sections")
 
-add_compile_definitions(TARGET_DEFS)
-include_directories(TARGET_INCLUDES)
+add_compile_definitions(${TARGET_DEFS})
+include_directories(${TARGET_INCLUDES})
 
 add_executable(${CMAKE_PROJECT_NAME}.elf ${TARGET_SOURCES})
 target_link_options(${CMAKE_PROJECT_NAME}.elf

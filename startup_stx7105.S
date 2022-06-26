@@ -30,6 +30,7 @@ _start:
     mov.l r0, @r1
     mov.l _gpio_clr_pc2_k, r1
     mov.l r0, @r1
+
     mov.l _sr_k, r0
     ldc r0, sr
     mov.l _stack_k, sp /* Setup R15(SP) */
@@ -144,7 +145,12 @@ _enable_se_mode:
     mov.l _ccn_pascr_value_k, r1
     mov.l r1, @r0
 
-    mova _copy_data, r0
+_setup_irq:
+    mov.l _exc_base_k, r0
+    ldc r0, vbr
+
+_go_non_privileged:
+    mov.l _crt0_entry, r0
     ldc r0, spc
     stc sr, r0
     ldc r0, ssr
@@ -162,7 +168,7 @@ _loop_copy_data:
     mov.l @r0+, r3 /* Load a word to r3 from [sidata], with post-increment of 4 */
     mov.l r3, @r1  /* Store the word in r3 to [sdata] */
     add #4, r1     /* Increment sdata pointer */
-    cmp/ge r1, r2
+    cmp/gt r1, r2  /* r2 greater or equal than r1? */
     bt _loop_copy_data
 
 _zero_bss:
@@ -173,7 +179,7 @@ _zero_bss:
 _loop_zero_bss:
     mov.l r2, @r0
     add #4, r0
-    cmp/ge r0, r1
+    cmp/gt r0, r1
     bt _loop_zero_bss
 
 /* Turn on Blue LED */
@@ -186,11 +192,6 @@ _setup_fpu:
     jsr @r1
     mov #0, r4
     lds r3, fpscr
-
-/* Turn on Red LED */
-    mov #32, r7
-    mov.l _gpio_set_k, r8
-    mov.l r7, @r8
 
 _main_entry:
     mov.l _main_k, r0
@@ -284,6 +285,9 @@ _gpio_set_pc1_k:
 _gpio_clr_pc2_k:
     .long 0xFD020048
 
+_crt0_entry:
+    .long _copy_data
+
 /* libc FPU routine */
 _set_fpscr_k:
     .long ___set_fpscr
@@ -307,3 +311,19 @@ _main_k:
     .long _main /* Same address as main */
 _exit_k:
     .long _exit
+_exc_base_k:
+    .long _exc_base
+
+
+    .section .text.exc, "ax"
+    .align 4
+_exc_base:
+    .org 0x100, 0x00
+_exc_grnl_vector:
+    mov.l _exc_grnl_entry, r0
+    jmp @r0
+    nop
+
+    .align 4
+_exc_grnl_entry:
+    .long _general_exc_handler

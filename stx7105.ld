@@ -15,6 +15,7 @@ SECTIONS {
     .text : {
         . = ALIGN(4);
         *(.text.init)
+        *(.text.exc)
         *(.text)
         *(.text*)
         *(.rodata)
@@ -22,15 +23,16 @@ SECTIONS {
         . = ALIGN(4);
     } >EMI
 
+    _sidata = LOADADDR(.data);
+
     .data : {
         . = ALIGN(4);
         _sdata = .;
         *(.data)
         *(.data*)
+        . = ALIGN(4);
         _edata = .;
     } >LMI AT >EMI
-
-    _sidata = LOADADDR(.data);
 
     .bss : {
         . = ALIGN(4);
@@ -38,7 +40,8 @@ SECTIONS {
         *(.bss)
         *(.bss*)
         *(COMMON)
-        _end = ALIGN(8);
+        . = ALIGN(8);
+        _end = .;
         __end = _end;
     } >LMI
 

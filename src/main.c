@@ -1,82 +1,101 @@
 #include <stdint.h>
+#include <stdio.h>
 
-#define ST_GPIO0_BASE_ADDR       (0xFD020000)
-#define ST_GPIO0_OFFSET_POUT     0x00U
-#define ST_GPIO0_OFFSET_SET_POUT 0x04U
-#define ST_GPIO0_OFFSET_CLR_POUT 0x08U
-#define ST_GPIO0_OFFSET_PC0      0x20U
-#define ST_GPIO0_OFFSET_SET_PC0  0x24U
-#define ST_GPIO0_OFFSET_CLR_PC0  0x28U
-#define ST_GPIO0_OFFSET_PC1      0x30U
-#define ST_GPIO0_OFFSET_SET_PC1  0x34U
-#define ST_GPIO0_OFFSET_CLR_PC1  0x38U
-#define ST_GPIO0_OFFSET_PC2      0x40U
-#define ST_GPIO0_OFFSET_SET_PC2  0x44U
-#define ST_GPIO0_OFFSET_CLR_PC2  0x48U
+#include "stx7105.h"
 
-#define SH_TMU_BASE_ADDR    (0xFFD80000)
-#define SH_TMU_OFFSET_TOCR  0x00U
-#define SH_TMU_OFFSET_TSTR  0x04U
-#define SH_TMU_OFFSET_TCOR0 0x08U
-#define SH_TMU_OFFSET_TCNT0 0x0CU
-#define SH_TMU_OFFSET_TCR0  0x10U
-#define SH_TMU_OFFSET_TCOR1 0x14U
-#define SH_TMU_OFFSET_TCNT1 0x18U
-#define SH_TMU_OFFSET_TCR1  0x1CU
-#define SH_TMU_OFFSET_TCOR2 0x20U
-#define SH_TMU_OFFSET_TCNT2 0x24U
-#define SH_TMU_OFFSET_TCR2  0x28U
-#define SH_TMU_OFFSET_TCPR2 0x2CU
-
+#define LED_RED_GPIO PIO0
 #define LED_RED_PIN  5U
-#define LED_BLUE_PIN 4U
 
-static void init_led(uint8_t pin) {
-    *(uint32_t *)(ST_GPIO0_BASE_ADDR + ST_GPIO0_OFFSET_CLR_PC0) = (1 << pin);
-    *(uint32_t *)(ST_GPIO0_BASE_ADDR + ST_GPIO0_OFFSET_SET_PC1) = (1 << pin);
-    *(uint32_t *)(ST_GPIO0_BASE_ADDR + ST_GPIO0_OFFSET_CLR_PC2) = (1 << pin);
+#define LED_BLUE_GPIO PIO0
+#define LED_BLUE_PIN  4U
+
+#define CONSOLE_ASC     ASC2
+#define SYSTEM_DEVID    (0xFE001000U) /* DEVID */
+#define SYSTEM_CONFIG34 (0xFE001188U) /* PIO4 */
+#define SYSTEM_CONFIG7  (0xFE00111CU) /* RXSEL */
+
+static void set_led(PIO_TypeDef *gpiox, uint8_t pin, uint8_t val);
+
+static void init_led(PIO_TypeDef *gpiox, uint8_t pin, uint8_t init_value) {
+    gpiox->CLR_PC0 = 1 << pin;
+    gpiox->SET_PC1 = 1 << pin;
+    gpiox->CLR_PC2 = 1 << pin;
+
+    set_led(gpiox, pin, init_value);
 }
 
-static void set_led(uint8_t pin, uint8_t val) {
+static void set_led(PIO_TypeDef *gpiox, uint8_t pin, uint8_t val) {
     if (val) {
-        *(uint32_t *)(ST_GPIO0_BASE_ADDR + ST_GPIO0_OFFSET_SET_POUT) = (1 << pin);
+        gpiox->SET_POUT = (1 << pin);
 
     } else {
-        *(uint32_t *)(ST_GPIO0_BASE_ADDR + ST_GPIO0_OFFSET_CLR_POUT) = (1 << pin);
+        gpiox->CLR_POUT = (1 << pin);
     }
 }
 
 static void delay_ms(uint32_t msec) {
     /* Initialize TMU and count to zero */
     /* TMU clock is from Peripheral clock, approx. 66MHz */
-    /* Prescale to 450kHz for convenience (TMUs can only divide by max. 1024) */
+    /* Prescale to 66kHz for convenience (TMUs can only divide by max. 1024) */
 
-    *(uint8_t *)(SH_TMU_BASE_ADDR + SH_TMU_OFFSET_TSTR) &= ~1U;          /* Stop counter */
-    *(uint16_t *)(SH_TMU_BASE_ADDR + SH_TMU_OFFSET_TCR0)  = 0x04U;       /* 1024 prescale */
-    *(uint32_t *)(SH_TMU_BASE_ADDR + SH_TMU_OFFSET_TCNT0) = (msec * 66); /* 66kHz */
-    *(uint8_t *)(SH_TMU_BASE_ADDR + SH_TMU_OFFSET_TSTR) |= 1U;           /* Start counter */
+    uint32_t reload_value = msec * 66 - 1;
+
+    TMU->TSTR &= ~1U;          /* Stop counter */
+    TMU->TCR0  = 0x04U;        /* 1024 prescale */
+    TMU->TCNT0 = reload_value; /* 66kHz */
+    TMU->TCOR0 = reload_value; /* Reload register */
+    TMU->TSTR |= 1U;           /* Start counter */
 
     /* Wait until underflow occurs */
     uint16_t tcr0 = 0U;
     do {
-        tcr0 = *(uint16_t *)(SH_TMU_BASE_ADDR + SH_TMU_OFFSET_TCR0);
+        tcr0 = TMU->TCR0;
     } while ((tcr0 & 0x100) == 0);
 
-    *(uint8_t *)(SH_TMU_BASE_ADDR + SH_TMU_OFFSET_TSTR) &= ~1U; /* Stop counter */
+    TMU->TSTR &= ~1U; /* Stop counter */
+}
+
+static void uart_init(void) {
+    PIO4->CLR_PC0 = 1U; /* PC = 110, AFOUT, PP */
+    PIO4->SET_PC1 = 1U;
+    PIO4->SET_PC2 = 1U;
+
+    // *(uint32_t *)SYSTEM_CONFIG34 = 0x00000100UL;  /* BIT[8,0] = 10, AF 3 */
+    // *(uint32_t *)SYSTEM_CONFIG7 &= ~(0x00000006UL); /* BIT[2:1], UART2 RX SEL */
+
+    // CONSOLE_ASC->CTRL     = 0x1509UL; /* 8N1, RX enable, FIFO enable, Baud mode 1 */
+    // CONSOLE_ASC->BAUDRATE = 0x04B8UL; /* 115200 in baud mode 1, assuming Fcomm=100MHz */
+    // CONSOLE_ASC->TX_RST   = 0x01UL;   /* Reset TX FIFO, any value OK */
+    // CONSOLE_ASC->RX_RST   = 0x01UL;   /* Reset RX FIFO, any value OK */
+    // CONSOLE_ASC->CTRL     = 0x1589UL; /* 8N1, RX enable, FIFO enable, Baud mode 1 */
 }
 
 int main(void) {
-    init_led(LED_RED_PIN);
-    init_led(LED_BLUE_PIN);
+    // init_led(LED_RED_GPIO, LED_RED_PIN, 0U);
+    // init_led(LED_BLUE_GPIO, LED_BLUE_PIN, 0U);
 
-    set_led(LED_RED_PIN, 0);
-    set_led(LED_BLUE_PIN, 0);
+    // if(*(uint32_t *)SYSTEM_DEVID != 0x2D43E041UL) {
+    //     set_led(LED_RED_GPIO, LED_RED_PIN, 1U);
+    // }
+
+    *(uint32_t *)SYSTEM_CONFIG34 = 0x00000100UL;  /* BIT[8,0] = 10, AF 3 */
+
+    uart_init();
+
+    // for (uint16_t i = 0; i < 65534; i++) {
+    //     CONSOLE_ASC->TX_BUF = i;
+    //     while (CONSOLE_ASC->STA & 0x200) {
+    //         /**/
+    //     }
+    // }
+
+    // printf("Hello world\r\n");
 
     for (;;) {
         /* Dead loop */
-        set_led(LED_BLUE_PIN, 1);
-        delay_ms(1);
-        set_led(LED_BLUE_PIN, 0);
-        delay_ms(1);
+        // set_led(LED_BLUE_GPIO, LED_BLUE_PIN, 1);
+        // delay_ms(1000);
+        // set_led(LED_BLUE_GPIO, LED_BLUE_PIN, 0);
+        // delay_ms(1000);
     }
 }
