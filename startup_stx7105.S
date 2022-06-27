@@ -216,7 +216,45 @@ _setup_fpu:
     mov.b r1, @r0
 
 
+_memory_test:
+    mov.l _sdata_k, r0
+    mov.l _stack_k, r1
+
+_loop_memory_write:
+    mov.l r1, @-r1
+    cmp/gt r0, r1
+    bt _loop_memory_write
+
+_memory_compare:
+    mov.l _stack_k, r1
+_loop_memory_compare:
+    mov r1, r3
+    mov.l @r1+, r2
+    cmp/eq r2, r3
+    bt _loop_memory_compare_addr
+    mova _memory_fail_set_led, r0
+    jmp @r0
+    nop
+_loop_memory_compare_addr:
+    cmp/gt r0, r1
+    bt _loop_memory_compare
+    mova _main_entry, r0
+    jmp @r0
+    nop
+    .align 2
+_memory_fail_set_led:
+/* Turn on Red LED */
+    mov #32, r7
+    mov.l _gpio_set_k, r8
+    mov.l r7, @r8
+
+    .align 2
 _main_entry:
+/* Turn off Blue LED */
+    mov #16, r7
+    mov.l _gpio_clr_k, r8
+    mov.l r7, @r8
+
     mov.l _main_k, r0
     jsr @r0
     or r0, r0
