@@ -7,17 +7,19 @@ project(hello)
 set(TARGET_LDSCRIPT "${CMAKE_SOURCE_DIR}/stx7105.ld")
 
 set(TARGET_SOURCES
+    "lib/printf/printf.c"
     "src/main.c"
     "src/stx7105_exc.c"
+    "src/stx7105_utils.c"
     "startup_stx7105.S"
-    "startup_stx7105_init_ram.S"
 )
 
 set(TARGET_INCLUDES
     "include"
+    "lib/printf"
 )
 
-set(TARGET_FLAGS_HARDWARE "-m4a -ml")
+set(TARGET_FLAGS_HARDWARE "-m4-300 -ml")
 
 set(CMAKE_C_FLAGS_DEBUG          "-DDEBUG -g -O0")
 set(CMAKE_CXX_FLAGS_DEBUG        "-DDEBUG -g -O0")

@@ -6,7 +6,7 @@
 #define __PACKED __attribute__((packed, aligned(1)))
 #define __IO     volatile
 
-typedef struct __PACKED {
+typedef struct {
     __IO uint8_t POUT;        /* Offset: 0x00, GPIO pin output register */
     __IO uint8_t UNUSED0[3];  /* Offset: 0x01 */
     __IO uint8_t SET_POUT;    /* Offset: 0x04, GPIO pin output set register */
@@ -46,7 +46,7 @@ typedef struct __PACKED {
     __IO uint8_t CLR_PMASK;   /* Offset: 0x68, GPIO pin input comparison mask clear regiser */
 } PIO_TypeDef;
 
-typedef struct __PACKED {
+typedef struct {
     __IO uint32_t BAUDRATE;  /* Offset: 0x00, ASCn baud rate generator register */
     __IO uint32_t TX_BUF;    /* Offset: 0x04, ASCn transmit buffer register */
     __IO uint32_t RX_BUF;    /* Offset: 0x08, ASCn receive buffer register */
@@ -60,25 +60,27 @@ typedef struct __PACKED {
     __IO uint32_t RETRIES;   /* Offset: 0x28, ASCn number of retries on transmission register */
 } ASC_TypeDef;
 
-typedef struct __PACKED {
+typedef struct {
     __IO uint8_t  TOCR;       /* Offset: 0x00, Timer output control register */
-    __IO uint8_t  UNUSED0[3]; /* Offset: 0x01 */
+    uint8_t       UNUSED0[3]; /* Offset: 0x01 */
     __IO uint8_t  TSTR;       /* Offset: 0x04, Timer start register */
-    __IO uint8_t  UNUSED1[3]; /* Offset: 0x05 */
+    uint8_t       UNUSED1[3]; /* Offset: 0x05 */
     __IO uint32_t TCOR0;      /* Offset: 0x08, Timer constant register 0 */
     __IO uint32_t TCNT0;      /* Offset: 0x0C, Timer counter 0 */
     __IO uint16_t TCR0;       /* Offset: 0x10, Timer control register 0 */
-    __IO uint8_t  UNUSED2[2]; /* Offset: 0x11 */
+    uint8_t       UNUSED2[2]; /* Offset: 0x11 */
     __IO uint32_t TCOR1;      /* Offset: 0x14, Timer constant register 1 */
     __IO uint32_t TCNT1;      /* Offset: 0x18, Timer counter 1 */
     __IO uint16_t TCR1;       /* Offset: 0x1C, Timer control register 1 */
-    __IO uint8_t  UNUSED3[2]; /* Offset: 0x1D */
+    uint8_t       UNUSED3[2]; /* Offset: 0x1E */
     __IO uint32_t TCOR2;      /* Offset: 0x20, Timer constant register 2 */
     __IO uint32_t TCNT2;      /* Offset: 0x24, Timer counter 2 */
     __IO uint16_t TCR2;       /* Offset: 0x28, Timer control register 2 */
-    __IO uint8_t  UNUSED4[2]; /* Offset: 0x29 */
-    __IO uint32_t TCPR2;      /* Offset: 0x2C */
+    __IO uint8_t  UNUSED4[2]; /* Offset: 0x2A */
+    uint32_t      TCPR2;      /* Offset: 0x2C */
 } TMU_TypeDef;
+
+#define XX sizeof(TMU_TypeDef)
 
 #define PIO0_BASE (0xFD020000U)
 #define PIO4_BASE (0xFD024000U)
