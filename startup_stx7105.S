@@ -1,7 +1,8 @@
 /*
- * This section is read by bootloader, then the application will be copied.
- * DO NOT REMOVE.
- * See SPL README for details.
+ * This section is read by bootloader,
+ * then the application will be copied according to the contents.
+ * !!DO NOT REMOVE!!
+ * See SPL project README for details.
  */
 
     .section .text.vtors, "ax"
@@ -9,12 +10,10 @@ _vtors:
     .long _eidata
     .long _start
 
-/* Startup code, we can't use non-PIC code nor RAM before the LMI is initialized:
- * The CPU starts with physical address 0x0, however the linker is linked to virtual
- * addresses and LMI.
- * Non-PIC code means any indirect addressing other than relative to PC.
+/*
+ * Startup code (CRT0)
  */
-    .section .text.init
+    .section .text.init, "ax"
     .global _start
 
 _start:
@@ -48,6 +47,15 @@ _setup_fpu:
     jsr @r1
     mov #0, r4
     lds r3, fpscr
+
+_setup_irq:
+    mov.l _exc_base_k, r0
+    ldc r0, vbr
+
+    stc sr, r0 /* Store SR into R0 */
+    mov.l _exc_imask_k, r1
+    and r1, r0
+    ldc r0, sr
 
     .align 2
 _main_entry:
@@ -84,17 +92,34 @@ _exit_k:
     .long _exit
 _exc_base_k:
     .long _exc_base
+_exc_imask_k:
+    .long 0xFFFFFF0F /* Clear IMASK (SR[7:4]) to 0, enable all exception levels */
 
+/*
+ * Exception handlers
+ * These handlers are placed at VBR related addresses
+ */
 
     .section .text.exc, "ax"
     .align 4
 _exc_base:
     .org 0x100, 0x00
 _exc_grnl_vector:
-    mov.l _exc_grnl_entry, r0
+    mov.l _exc_grnl_entry_k, r0
     jmp @r0
     nop
 
     .align 4
-_exc_grnl_entry:
+_exc_grnl_entry_k:
     .long _general_exc_handler
+
+_int_base:
+    .org 0x600, 0x00
+_int_grnl_vector:
+    mov.l _int_grnl_entry_k, r0
+    jmp @r0
+    nop
+
+    .align 4
+_int_grnl_entry_k:
+    .long _general_int_handler

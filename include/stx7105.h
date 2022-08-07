@@ -80,6 +80,29 @@ typedef struct {
     uint32_t      TCPR2;      /* Offset: 0x2C */
 } TMU_TypeDef;
 
+typedef struct {
+    __IO uint32_t PTEH;        /* Offset: 0x00, Page table entry high register */
+    __IO uint32_t PTEL;        /* Offset: 0x04, Page table entry low register */
+    __IO uint32_t TTB;         /* Offset: 0x08, Translation table base register */
+    __IO uint32_t TEA;         /* Offset: 0x0C, TLB exception address register */
+    __IO uint32_t MMUCR;       /* Offset: 0x10, MMU control register */
+    __IO uint8_t  BASRA;       /* Offset: 0x14, Break ASID register A*/
+    uint8_t       UNUSED0[3];  /* Offset: 0x15 */
+    __IO uint8_t  BASRB;       /* Offset: 0x18, Break ASID register B*/
+    uint8_t       UNUSED1[3];  /* Offset: 0x19 */
+    __IO uint32_t CCR;         /* Offset: 0x1C, Cache control register */
+    __IO uint32_t TRA;         /* Offset: 0x20, TRAPA exception register */
+    __IO uint32_t EXPEVT;      /* Offset: 0x24, Exception event register */
+    __IO uint32_t INTEVT;      /* Offset: 0x28, Interrupt event register */
+    uint32_t      UNUSED2[3];  /* Offset: 0x2C */
+    __IO uint32_t QACR0;       /* Offset: 0x38, Queue address control register 0 */
+    __IO uint32_t QACR1;       /* Offset: 0x3C, Queue address control register 1 */
+    uint32_t      UNUSED3[12]; /* Offset: 0x40 */
+    __IO uint32_t PASCR;       /* Offset: 0x70, Physical address space control register */
+    __IO uint32_t RAMCR;       /* Offset: 0x74, On-chip memory control register */
+    __IO uint32_t IRMCR;       /* Offset: 0x78, Instruction refetch inhibit control register */
+} CSR_TypeDef;
+
 #define XX sizeof(TMU_TypeDef)
 
 #define PIO0_BASE (0xFD020000U)
@@ -88,6 +111,7 @@ typedef struct {
 #define ASC1_BASE (0xFD031000U)
 #define ASC2_BASE (0xFD032000U)
 #define ASC3_BASE (0xFD033000U)
+#define CSR_BASE  (0xFF000000U)
 #define TMU_BASE  (0xFFD80000U)
 
 #define PIO0 ((PIO_TypeDef *)PIO0_BASE)
@@ -96,6 +120,7 @@ typedef struct {
 #define ASC1 ((ASC_TypeDef *)ASC1_BASE)
 #define ASC2 ((ASC_TypeDef *)ASC2_BASE)
 #define ASC3 ((ASC_TypeDef *)ASC3_BASE)
+#define CSR  ((CSR_TypeDef *)CSR_BASE)
 #define TMU  ((TMU_TypeDef *)TMU_BASE)
 
 #endif
