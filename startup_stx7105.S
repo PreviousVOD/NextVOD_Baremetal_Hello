@@ -93,7 +93,7 @@ _exit_k:
 _exc_base_k:
     .long _exc_base
 _exc_imask_k:
-    .long 0xFFFFFF0F /* Clear IMASK (SR[7:4]) to 0, enable all exception levels */
+    .long 0xEFFFFF0F /* Clear IMASK (SR[7:4]) to 0 and BL bit, enable all exception levels */
 
 /*
  * Exception handlers

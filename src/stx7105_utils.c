@@ -1,5 +1,9 @@
 #include "stx7105.h"
+
+/* Private */
 #include "stx7105_utils.h"
+
+volatile uint8_t s_tmu_flag = 0U;
 
 void init_led(PIO_TypeDef *gpiox, uint8_t pin, uint8_t init_value) {
     gpiox->CLR_PC0 = 1 << pin;
@@ -25,17 +29,28 @@ void delay_ms(uint32_t msec) {
 
     uint32_t reload_value = msec * 66 - 1;
 
-    TMU->TSTR &= ~1U;          /* Stop counter */
-    TMU->TCR0  = 0x04U;        /* 1024 prescale */
-    TMU->TCNT0 = reload_value; /* 66kHz */
-    TMU->TCOR0 = reload_value; /* Reload register */
-    TMU->TSTR |= 1U;           /* Start counter */
+    TMU->TSTR &= ~TMU_TSTR_STR0_Msk;       /* Stop counter */
+    TMU->TCR0  = 0x04U | TMU_TCR_UNIE_Msk; /* 1024 prescale, enable interrupt */
+    TMU->TCNT0 = reload_value;             /* 66kHz */
+    TMU->TCOR0 = reload_value;             /* Reload register */
+    TMU->TSTR |= TMU_TSTR_STR0_Msk;        /* Start counter */
+
+    INTC->IPRA &= ~INTC_IPRA_IPR_TMU0_Msk;
+    INTC->IPRA |= (1U << INTC_IPRA_IPR_TMU0_Pos); /* Interrupt priority 1 */
 
     /* Wait until underflow occurs */
-    uint16_t tcr0 = 0U;
-    do {
-        tcr0 = TMU->TCR0;
-    } while ((tcr0 & 0x100) == 0);
+    while(s_tmu_flag != 1) {
+        asm("sleep");
+    }
 
-    TMU->TSTR &= ~1U; /* Stop counter */
+    s_tmu_flag = 0U;
+
+    TMU->TSTR &= ~TMU_TSTR_STR0_Msk; /* Stop counter */
+}
+
+int tuni0_handler(void) {
+    s_tmu_flag = 1U;
+    TMU->TCR0 &= ~(TMU_TCR_UNF_Msk);
+
+    return 0;
 }
