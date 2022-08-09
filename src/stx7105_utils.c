@@ -24,10 +24,10 @@ void set_led(PIO_TypeDef *gpiox, uint8_t pin, uint8_t val) {
 
 void delay_ms(uint32_t msec) {
     /* Initialize TMU and count to zero */
-    /* TMU clock is from Peripheral clock, approx. 66MHz */
-    /* Prescale to 66kHz for convenience (TMUs can only divide by max. 1024) */
+    /* TMU clock is from Peripheral clock, approx. 100MHz */
+    /* Prescale to 100kHz for convenience (TMUs can only divide by max. 1024) */
 
-    uint32_t reload_value = msec * 66 - 1;
+    uint32_t reload_value = msec * 100 - 1;
 
     TMU->TSTR &= ~TMU_TSTR_STR0_Msk;       /* Stop counter */
     TMU->TCR0  = 0x04U | TMU_TCR_UNIE_Msk; /* 1024 prescale, enable interrupt */

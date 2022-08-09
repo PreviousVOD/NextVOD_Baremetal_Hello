@@ -16,6 +16,9 @@
 #define SYSTEM_CONFIG34 (0xFE001188U) /* PIO4 */
 #define SYSTEM_CONFIG7  (0xFE00111CU) /* RXSEL */
 
+#define MEMTEST_START 0x80010000
+#define MEMTEST_END   0x8FFE0000
+
 void uart_init(void) {
     PIO4->CLR_PC0 = 1U; /* PC = 110, AFOUT, PP */
     PIO4->SET_PC1 = 1U;
@@ -31,6 +34,28 @@ void uart_init(void) {
     CONSOLE_ASC->CTRL     = 0x1589UL; /* 8N1, RX enable, FIFO enable, Baud mode 1 */
 }
 
+static void memory_test(void) {
+    for (uint32_t i = MEMTEST_START; i < MEMTEST_END; i += 4) {
+        *(uint32_t *)i = i;
+
+        if (i % 0x10000 == 0U) {
+            printf("Write to 0x%08x...\r\n", i);
+        }
+    }
+
+    for (uint32_t i = MEMTEST_START; i < MEMTEST_END; i += 4) {
+        if (*(uint32_t *)i != i) {
+            printf("Read back error at 0x%08x\r\n", i);
+
+            return;
+        }
+
+        if (i % 0x10000 == 0U) {
+            printf("Read from 0x%08x...\r\n", i);
+        }
+    }
+}
+
 int main(void) {
     init_led(LED_RED_GPIO, LED_RED_PIN, 0U);
     init_led(LED_BLUE_GPIO, LED_BLUE_PIN, 0U);
@@ -39,10 +64,22 @@ int main(void) {
 
     printf("Hello world\r\n");
 
+    printf("Size of int: %d\r\n", sizeof(int));
+    printf("Size of short: %d\r\n", sizeof(short));
+    printf("Size of char: %d\r\n", sizeof(char));
+    printf("Size of long: %d\r\n", sizeof(long));
+    printf("Size of pointer: %d\r\n", sizeof(uint8_t *));
+    printf("Size of uint8_t: %d\r\n", sizeof(uint8_t));
+    printf("Size of uint16_t: %d\r\n", sizeof(uint16_t));
+    printf("Size of uint32_t: %d\r\n", sizeof(uint32_t));
+
+    delay_ms(5000);
+
+    memory_test();
+
     for (;;) {
         set_led(LED_BLUE_GPIO, LED_BLUE_PIN, 1U);
         delay_ms(500);
-        printf("Hello ?\r\n");
         set_led(LED_BLUE_GPIO, LED_BLUE_PIN, 0U);
         delay_ms(500);
     }
@@ -51,7 +88,7 @@ int main(void) {
 }
 
 void _putchar(char ch) {
-    while(CONSOLE_ASC->STA & 1 << 9U) {
+    while (CONSOLE_ASC->STA & 1 << 9U) {
         // wait for TX FIFO slot.
     }
     CONSOLE_ASC->TX_BUF = ch;

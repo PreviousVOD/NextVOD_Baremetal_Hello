@@ -31,7 +31,7 @@ set(CMAKE_EXE_LINKER_FLAGS_RELEASE "-flto")
 
 set(CMAKE_C_FLAGS          "${TARGET_FLAGS_HARDWARE} -Wall -ffunction-sections -fdata-sections")
 set(CMAKE_CXX_FLAGS        "${TARGET_FLAGS_HARDWARE} -Wall -ffunction-sections -fdata-sections")
-set(CMAKE_EXE_LINKER_FLAGS "${TARGET_FLAGS_HARDWARE} -Wall -lc -lm -nostartfiles -Wl,--print-memory-usage -Wl,--gc-sections")
+set(CMAKE_EXE_LINKER_FLAGS "${TARGET_FLAGS_HARDWARE} -Wall -specs=nosys.specs -lc -lm -nostartfiles -Wl,--print-memory-usage -Wl,--gc-sections")
 
 add_compile_definitions(${TARGET_DEFS})
 include_directories(${TARGET_INCLUDES})
