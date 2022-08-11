@@ -131,35 +131,44 @@ typedef struct {
     uint8_t       UNUSED9[2];       /* Offset: 0x20022 */
 } CSR_TypeDef;
 
-#define PIO0_BASE (0xFD020000U)
-#define PIO1_BASE (0xFD021000U)
-#define PIO2_BASE (0xFD022000U)
-#define PIO3_BASE (0xFD023000U)
-#define PIO4_BASE (0xFD024000U)
-#define PIO5_BASE (0xFD025000U)
-#define PIO6_BASE (0xFD026000U)
-#define ASC0_BASE (0xFD030000U)
-#define ASC1_BASE (0xFD031000U)
-#define ASC2_BASE (0xFD032000U)
-#define ASC3_BASE (0xFD033000U)
-#define CSR_BASE  (0xFF000000U)
-#define INTC_BASE (0xFFD00000U)
-#define TMU_BASE  (0xFFD80000U)
+typedef struct {
+    __IO uint32_t SLIM_ID;       /* Offset: 0x0000, SLIM CPU ID register */
+    __IO uint32_t SLIM_VER;      /* Offset: 0x0004, SLIM CPU version register */
+    __IO uint32_t SLIM_EN;       /* Offset: 0x0008, SLIM CPU enable control register */
+    __IO uint32_t SLIM_CLK_GATE; /* Offset: 0x000C, SLIM CPU clock gate register */
+} FDMA_TypeDef;
 
-#define PIO0 ((PIO_TypeDef *)PIO0_BASE)
-#define PIO1 ((PIO_TypeDef *)PIO1_BASE)
-#define PIO2 ((PIO_TypeDef *)PIO2_BASE)
-#define PIO3 ((PIO_TypeDef *)PIO3_BASE)
-#define PIO4 ((PIO_TypeDef *)PIO4_BASE)
-#define PIO5 ((PIO_TypeDef *)PIO5_BASE)
-#define PIO6 ((PIO_TypeDef *)PIO6_BASE)
-#define ASC0 ((ASC_TypeDef *)ASC0_BASE)
-#define ASC1 ((ASC_TypeDef *)ASC1_BASE)
-#define ASC2 ((ASC_TypeDef *)ASC2_BASE)
-#define ASC3 ((ASC_TypeDef *)ASC3_BASE)
-#define CSR  ((CSR_TypeDef *)CSR_BASE)
-#define INTC ((INTC_TypeDef *)INTC_BASE)
-#define TMU  ((TMU_TypeDef *)TMU_BASE)
+#define PIO0_BASE  (0xFD020000U)
+#define PIO1_BASE  (0xFD021000U)
+#define PIO2_BASE  (0xFD022000U)
+#define PIO3_BASE  (0xFD023000U)
+#define PIO4_BASE  (0xFD024000U)
+#define PIO5_BASE  (0xFD025000U)
+#define PIO6_BASE  (0xFD026000U)
+#define ASC0_BASE  (0xFD030000U)
+#define ASC1_BASE  (0xFD031000U)
+#define ASC2_BASE  (0xFD032000U)
+#define ASC3_BASE  (0xFD033000U)
+#define FDMA0_BASE (0xFE220000U)
+#define CSR_BASE   (0xFF000000U)
+#define INTC_BASE  (0xFFD00000U)
+#define TMU_BASE   (0xFFD80000U)
+
+#define PIO0  ((PIO_TypeDef *)PIO0_BASE)
+#define PIO1  ((PIO_TypeDef *)PIO1_BASE)
+#define PIO2  ((PIO_TypeDef *)PIO2_BASE)
+#define PIO3  ((PIO_TypeDef *)PIO3_BASE)
+#define PIO4  ((PIO_TypeDef *)PIO4_BASE)
+#define PIO5  ((PIO_TypeDef *)PIO5_BASE)
+#define PIO6  ((PIO_TypeDef *)PIO6_BASE)
+#define ASC0  ((ASC_TypeDef *)ASC0_BASE)
+#define ASC1  ((ASC_TypeDef *)ASC1_BASE)
+#define ASC2  ((ASC_TypeDef *)ASC2_BASE)
+#define ASC3  ((ASC_TypeDef *)ASC3_BASE)
+#define CSR   ((CSR_TypeDef *)CSR_BASE)
+#define FDMA0 ((FDMA_TypeDef *)FDMA0_BASE)
+#define INTC  ((INTC_TypeDef *)INTC_BASE)
+#define TMU   ((TMU_TypeDef *)TMU_BASE)
 
 #define TMU_TSTR_STR0_Pos 0
 #define TMU_TSTR_STR0_Msk (1U << TMU_TSTR_STR0_Pos)
