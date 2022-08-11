@@ -1,7 +1,6 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#include "printf.h"
 #include "stx7105.h"
 #include "stx7105_utils.h"
 
@@ -16,8 +15,8 @@
 #define SYSTEM_CONFIG34 (0xFE001188U) /* PIO4 */
 #define SYSTEM_CONFIG7  (0xFE00111CU) /* RXSEL */
 
-#define MEMTEST_START 0x80010000
-#define MEMTEST_END   0x8FFE0000
+#define MEMTEST_START 0x82000000
+#define MEMTEST_END   0x8F000000
 
 void uart_init(void) {
     PIO4->CLR_PC0 = 1U; /* PC = 110, AFOUT, PP */
@@ -39,19 +38,19 @@ static void memory_test(void) {
         *(uint32_t *)i = i;
 
         if (i % 0x10000 == 0U) {
-            printf("Write to 0x%08x...\r\n", i);
+            printf("Write to 0x%08lx...\r\n", i);
         }
     }
 
     for (uint32_t i = MEMTEST_START; i < MEMTEST_END; i += 4) {
         if (*(uint32_t *)i != i) {
-            printf("Read back error at 0x%08x\r\n", i);
+            printf("Read back error at 0x%08lx\r\n", i);
 
             return;
         }
 
         if (i % 0x10000 == 0U) {
-            printf("Read from 0x%08x...\r\n", i);
+            printf("Read from 0x%08lx...\r\n", i);
         }
     }
 }
@@ -59,6 +58,9 @@ static void memory_test(void) {
 int main(void) {
     init_led(LED_RED_GPIO, LED_RED_PIN, 0U);
     init_led(LED_BLUE_GPIO, LED_BLUE_PIN, 0U);
+
+    setbuf(stdout,NULL);
+    setbuf(stderr,NULL);
 
     uart_init();
 
@@ -85,11 +87,4 @@ int main(void) {
     }
 
     return 0;
-}
-
-void _putchar(char ch) {
-    while (CONSOLE_ASC->STA & 1 << 9U) {
-        // wait for TX FIFO slot.
-    }
-    CONSOLE_ASC->TX_BUF = ch;
 }

@@ -7,10 +7,10 @@ project(hello)
 set(TARGET_LDSCRIPT "${CMAKE_SOURCE_DIR}/stx7105.ld")
 
 set(TARGET_SOURCES
-    "lib/printf/printf.c"
     "src/main.c"
     "src/stx7105_exc.c"
     "src/stx7105_utils.c"
+    "src/syscalls.c"
     "startup_stx7105.S"
 )
 
