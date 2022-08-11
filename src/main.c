@@ -33,51 +33,49 @@ void uart_init(void) {
     CONSOLE_ASC->CTRL     = 0x1589UL; /* 8N1, RX enable, FIFO enable, Baud mode 1 */
 }
 
-static void memory_test(void) {
-    for (uint32_t i = MEMTEST_START; i < MEMTEST_END; i += 4) {
-        *(uint32_t *)i = i;
-
-        if (i % 0x10000 == 0U) {
-            printf("Write to 0x%08lx...\r\n", i);
-        }
-    }
-
-    for (uint32_t i = MEMTEST_START; i < MEMTEST_END; i += 4) {
-        if (*(uint32_t *)i != i) {
-            printf("Read back error at 0x%08lx\r\n", i);
-
-            return;
-        }
-
-        if (i % 0x10000 == 0U) {
-            printf("Read from 0x%08lx...\r\n", i);
-        }
-    }
-}
-
 int main(void) {
     init_led(LED_RED_GPIO, LED_RED_PIN, 0U);
     init_led(LED_BLUE_GPIO, LED_BLUE_PIN, 0U);
 
-    setbuf(stdout,NULL);
-    setbuf(stderr,NULL);
+    setbuf(stdout, NULL);
+    setbuf(stderr, NULL);
 
     uart_init();
 
     printf("Hello world\r\n");
 
-    printf("Size of int: %d\r\n", sizeof(int));
-    printf("Size of short: %d\r\n", sizeof(short));
-    printf("Size of char: %d\r\n", sizeof(char));
-    printf("Size of long: %d\r\n", sizeof(long));
-    printf("Size of pointer: %d\r\n", sizeof(uint8_t *));
-    printf("Size of uint8_t: %d\r\n", sizeof(uint8_t));
-    printf("Size of uint16_t: %d\r\n", sizeof(uint16_t));
-    printf("Size of uint32_t: %d\r\n", sizeof(uint32_t));
+    printf("FDMA0 SLIM ID: 0x%08lx\r\n", FDMA0->SLIM_ID);
+    printf("FDMA0 SLIM Version: 0x%08lx\r\n", FDMA0->SLIM_VER);
+
+    printf("Dumping FDMA0 SLIM DMEM@%p: \r\n", FDMA0->SLIM_DMEM);
+
+    for (uint32_t i = 0; i < 2048; i++) {
+        if (i % 8 == 0) {
+            printf("0x%04lx: ", i * 4);
+        }
+
+        printf("0x%08lx ", ((uint32_t *)FDMA0->SLIM_DMEM)[i]);
+
+        if (i % 8 == 7) {
+            printf("\r\n");
+        }
+    }
+
+    printf("Dumping FDMA0 SLIM IMEM @%p: \r\n", FDMA0->SLIM_IMEM);
+
+    for (uint32_t i = 0; i < 4096; i++) {
+        if (i % 8 == 0) {
+            printf("0x%04lx: ", i * 4);
+        }
+
+        printf("0x%08lx ", ((uint32_t *)FDMA0->SLIM_IMEM)[i]);
+
+        if (i % 8 == 7) {
+            printf("\r\n");
+        }
+    }
 
     delay_ms(5000);
-
-    memory_test();
 
     for (;;) {
         set_led(LED_BLUE_GPIO, LED_BLUE_PIN, 1U);

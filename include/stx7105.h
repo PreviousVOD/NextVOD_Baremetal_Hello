@@ -131,11 +131,27 @@ typedef struct {
     uint8_t       UNUSED9[2];       /* Offset: 0x20022 */
 } CSR_TypeDef;
 
+/* drivers/stm/stx7105.c */
 typedef struct {
-    __IO uint32_t SLIM_ID;       /* Offset: 0x0000, SLIM CPU ID register */
-    __IO uint32_t SLIM_VER;      /* Offset: 0x0004, SLIM CPU version register */
-    __IO uint32_t SLIM_EN;       /* Offset: 0x0008, SLIM CPU enable control register */
-    __IO uint32_t SLIM_CLK_GATE; /* Offset: 0x000C, SLIM CPU clock gate register */
+    __IO uint32_t SLIM_ID;          /* Offset: 0x0000, SLIM CPU ID register */
+    __IO uint32_t SLIM_VER;         /* Offset: 0x0004, SLIM CPU version register */
+    __IO uint32_t SLIM_EN;          /* Offset: 0x0008, SLIM CPU enable control register */
+    __IO uint32_t SLIM_CLK_GATE;    /* Offset: 0x000C, SLIM CPU clock gate register */
+    uint32_t      UNUSED0[8188];    /* Offset: 0x0010 */
+    __IO uint8_t  SLIM_DMEM[8192];  /* Offset: 0x8000, SLIM CPU data memory */
+    uint32_t      UNUSED1[2018];    /* Offset: 0xA000 */
+    __IO uint32_t PERIPH_SYNC;      /* Offset: 0xBF88, Peripheral sync register */
+    uint32_t      UNUSED2[13];      /* Offset: 0xBF8C */
+    __IO uint32_t PERIPH_CMD_STA;   /* Offset: 0xBFC0, */
+    __IO uint32_t PERIPH_CMD_SET;   /* Offset: 0xBFC4, */
+    __IO uint32_t PERIPH_CMD_CLR;   /* Offset: 0xBFC8, */
+    __IO uint32_t PERIPH_CMD_MASK;  /* Offset: 0xBFCC, */
+    __IO uint32_t PERIPH_INT_STA;   /* Offset: 0xBFD0, */
+    __IO uint32_t PERIPH_INT_SET;   /* Offset: 0xBFD4, */
+    __IO uint32_t PERIPH_INT_CLR;   /* Offset: 0xBFD8, */
+    __IO uint32_t PERIPH_INT_MASK;  /* Offset: 0xBFDC, */
+    uint32_t      UNUSED3[8];       /* Offset: 0xBFE0 */
+    __IO uint8_t  SLIM_IMEM[16384]; /* Offset: 0xC000, SLIM CPU instruction memory */
 } FDMA_TypeDef;
 
 #define PIO0_BASE  (0xFD020000U)
@@ -150,6 +166,7 @@ typedef struct {
 #define ASC2_BASE  (0xFD032000U)
 #define ASC3_BASE  (0xFD033000U)
 #define FDMA0_BASE (0xFE220000U)
+#define FDMA1_BASE (0xFE410000U)
 #define CSR_BASE   (0xFF000000U)
 #define INTC_BASE  (0xFFD00000U)
 #define TMU_BASE   (0xFFD80000U)
@@ -167,6 +184,7 @@ typedef struct {
 #define ASC3  ((ASC_TypeDef *)ASC3_BASE)
 #define CSR   ((CSR_TypeDef *)CSR_BASE)
 #define FDMA0 ((FDMA_TypeDef *)FDMA0_BASE)
+#define FDMA1 ((FDMA_TypeDef *)FDMA1_BASE)
 #define INTC  ((INTC_TypeDef *)INTC_BASE)
 #define TMU   ((TMU_TypeDef *)TMU_BASE)
 
