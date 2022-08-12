@@ -1,7 +1,9 @@
 #include <stdint.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "stx7105.h"
+#include "stx7105_fdma_fw.h"
 #include "stx7105_utils.h"
 
 #define LED_RED_GPIO PIO0
@@ -44,36 +46,25 @@ int main(void) {
 
     printf("Hello world\r\n");
 
+    FDMA0->SLIM_CLK_GATE |= (FDMA_SLIM_CLK_GATE_DIS_Msk | FDMA_SLIM_CLK_GATE_RESET_Msk);
+    FDMA0->PERIPH_STBUS_SYNC |= FDMA_PERIPH_STBUS_SYNC_DIS_Msk;
+
+    for(uint32_t i = 0; i < stx7105_fdma0_fw.text_size; i++) {
+        FDMA0->SLIM_IMEM[i] = stx7105_fdma0_fw.text[i];
+    }
+
+    for(uint32_t i = 0; i < stx7105_fdma0_fw.data_size; i++) {
+        FDMA0->SLIM_DMEM[i] = stx7105_fdma0_fw.data[i];
+    }
+
+    FDMA0->SLIM_CLK_GATE &= ~FDMA_SLIM_CLK_GATE_DIS_Msk;
+    FDMA0->PERIPH_INT_CLR = 0xFFFFFFFFU;
+    FDMA0->PERIPH_CMD_CLR = 0xFFFFFFFFU;
+
+    FDMA0->SLIM_EN |= FDMA_SLIM_EN_RUN_Msk;
+
     printf("FDMA0 SLIM ID: 0x%08lx\r\n", FDMA0->SLIM_ID);
     printf("FDMA0 SLIM Version: 0x%08lx\r\n", FDMA0->SLIM_VER);
-
-    printf("Dumping FDMA0 SLIM DMEM@%p: \r\n", FDMA0->SLIM_DMEM);
-
-    for (uint32_t i = 0; i < 2048; i++) {
-        if (i % 8 == 0) {
-            printf("0x%04lx: ", i * 4);
-        }
-
-        printf("0x%08lx ", ((uint32_t *)FDMA0->SLIM_DMEM)[i]);
-
-        if (i % 8 == 7) {
-            printf("\r\n");
-        }
-    }
-
-    printf("Dumping FDMA0 SLIM IMEM @%p: \r\n", FDMA0->SLIM_IMEM);
-
-    for (uint32_t i = 0; i < 4096; i++) {
-        if (i % 8 == 0) {
-            printf("0x%04lx: ", i * 4);
-        }
-
-        printf("0x%08lx ", ((uint32_t *)FDMA0->SLIM_IMEM)[i]);
-
-        if (i % 8 == 7) {
-            printf("\r\n");
-        }
-    }
 
     delay_ms(5000);
 

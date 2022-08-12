@@ -133,25 +133,25 @@ typedef struct {
 
 /* drivers/stm/stx7105.c */
 typedef struct {
-    __IO uint32_t SLIM_ID;          /* Offset: 0x0000, SLIM CPU ID register */
-    __IO uint32_t SLIM_VER;         /* Offset: 0x0004, SLIM CPU version register */
-    __IO uint32_t SLIM_EN;          /* Offset: 0x0008, SLIM CPU enable control register */
-    __IO uint32_t SLIM_CLK_GATE;    /* Offset: 0x000C, SLIM CPU clock gate register */
-    uint32_t      UNUSED0[8188];    /* Offset: 0x0010 */
-    __IO uint8_t  SLIM_DMEM[8192];  /* Offset: 0x8000, SLIM CPU data memory */
-    uint32_t      UNUSED1[2018];    /* Offset: 0xA000 */
-    __IO uint32_t PERIPH_SYNC;      /* Offset: 0xBF88, Peripheral sync register */
-    uint32_t      UNUSED2[13];      /* Offset: 0xBF8C */
-    __IO uint32_t PERIPH_CMD_STA;   /* Offset: 0xBFC0, */
-    __IO uint32_t PERIPH_CMD_SET;   /* Offset: 0xBFC4, */
-    __IO uint32_t PERIPH_CMD_CLR;   /* Offset: 0xBFC8, */
-    __IO uint32_t PERIPH_CMD_MASK;  /* Offset: 0xBFCC, */
-    __IO uint32_t PERIPH_INT_STA;   /* Offset: 0xBFD0, */
-    __IO uint32_t PERIPH_INT_SET;   /* Offset: 0xBFD4, */
-    __IO uint32_t PERIPH_INT_CLR;   /* Offset: 0xBFD8, */
-    __IO uint32_t PERIPH_INT_MASK;  /* Offset: 0xBFDC, */
-    uint32_t      UNUSED3[8];       /* Offset: 0xBFE0 */
-    __IO uint8_t  SLIM_IMEM[16384]; /* Offset: 0xC000, SLIM CPU instruction memory */
+    __IO uint32_t SLIM_ID;           /* Offset: 0x0000, SLIM CPU ID register */
+    __IO uint32_t SLIM_VER;          /* Offset: 0x0004, SLIM CPU version register */
+    __IO uint32_t SLIM_EN;           /* Offset: 0x0008, SLIM CPU enable control register */
+    __IO uint32_t SLIM_CLK_GATE;     /* Offset: 0x000C, SLIM CPU clock gate register */
+    uint32_t      UNUSED0[8188];     /* Offset: 0x0010 */
+    __IO uint8_t  SLIM_DMEM[8192];   /* Offset: 0x8000, SLIM CPU data memory */
+    uint32_t      UNUSED1[2018];     /* Offset: 0xA000 */
+    __IO uint32_t PERIPH_STBUS_SYNC; /* Offset: 0xBF88, STBus sync control register */
+    uint32_t      UNUSED2[13];       /* Offset: 0xBF8C */
+    __IO uint32_t PERIPH_CMD_STA;    /* Offset: 0xBFC0, Command mailbox */
+    __IO uint32_t PERIPH_CMD_SET;    /* Offset: 0xBFC4, Command mailbox */
+    __IO uint32_t PERIPH_CMD_CLR;    /* Offset: 0xBFC8, Command mailbox */
+    __IO uint32_t PERIPH_CMD_MASK;   /* Offset: 0xBFCC, Command mailbox */
+    __IO uint32_t PERIPH_INT_STA;    /* Offset: 0xBFD0, Interrupt mailbox */
+    __IO uint32_t PERIPH_INT_SET;    /* Offset: 0xBFD4, Interrupt mailbox */
+    __IO uint32_t PERIPH_INT_CLR;    /* Offset: 0xBFD8, Interrupt mailbox */
+    __IO uint32_t PERIPH_INT_MASK;   /* Offset: 0xBFDC, Interrupt mailbox */
+    uint32_t      UNUSED3[8];        /* Offset: 0xBFE0 */
+    __IO uint8_t  SLIM_IMEM[16384];  /* Offset: 0xC000, SLIM CPU instruction memory */
 } FDMA_TypeDef;
 
 #define PIO0_BASE  (0xFD020000U)
@@ -205,5 +205,17 @@ typedef struct {
 
 #define INTC_IPRA_IPR_TMU0_Pos 12
 #define INTC_IPRA_IPR_TMU0_Msk (0x0FU << INTC_IPRA_IPR_TMU0_Pos)
+
+#define FDMA_SLIM_EN_RUN_Pos 0
+#define FDMA_SLIM_EN_RUN_Msk (1U << FDMA_SLIM_EN_RUN_Pos)
+
+#define FDMA_SLIM_CLK_GATE_DIS_Pos 0
+#define FDMA_SLIM_CLK_GATE_DIS_Msk (1U << FDMA_SLIM_CLK_GATE_DIS_Pos)
+
+#define FDMA_SLIM_CLK_GATE_RESET_Pos 2
+#define FDMA_SLIM_CLK_GATE_RESET_Msk (1U << FDMA_SLIM_CLK_GATE_RESET_Pos)
+
+#define FDMA_PERIPH_STBUS_SYNC_DIS_Pos 0
+#define FDMA_PERIPH_STBUS_SYNC_DIS_Msk (1U << FDMA_PERIPH_STBUS_SYNC_DIS_Pos)
 
 #endif

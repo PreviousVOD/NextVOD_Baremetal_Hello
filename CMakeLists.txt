@@ -10,6 +10,7 @@ set(TARGET_SOURCES
     "src/main.c"
     "src/stx7105_exc.c"
     "src/stx7105_utils.c"
+    "src/stx7105_fdma_fw.c"
     "src/syscalls.c"
     "startup_stx7105.S"
 )
