@@ -2,6 +2,7 @@
 #include <fcntl.h>
 #include <gelf.h>
 #include <libelf.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
@@ -70,7 +71,7 @@ static int get_section_idx_by_name(Elf *handle, char *name) {
     return -1;
 }
 
-static int dump_section_as_c_array(Elf *handle, int idx) {
+static int dump_section_as_c_array(Elf *handle, int idx, bool pad_32) {
     Elf_Scn *scn = elf_getscn(handle, idx);
     if (scn == NULL) {
         int es = elf_errno();
@@ -141,7 +142,7 @@ int main(int argc, const char *argv[]) {
         goto elf_out;
     }
 
-    ret = dump_section_as_c_array(e_handle, ret);
+    ret = dump_section_as_c_array(e_handle, ret, true);
 
     ret = get_section_idx_by_name(e_handle, ".data");
     if (ret < 0) {
@@ -151,7 +152,7 @@ int main(int argc, const char *argv[]) {
         goto elf_out;
     }
 
-    ret = dump_section_as_c_array(e_handle, ret);
+    ret = dump_section_as_c_array(e_handle, ret, false);
 
 elf_out:
     elf_end(e_handle);

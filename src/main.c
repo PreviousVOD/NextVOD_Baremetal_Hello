@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "stx7105.h"
+#include "stx7105_fdma.h"
 #include "stx7105_fdma_fw.h"
 #include "stx7105_utils.h"
 
@@ -20,6 +21,10 @@
 #define MEMTEST_START 0x82000000
 #define MEMTEST_END   0x8F000000
 
+#define DMA_BUFFER_SIZE 1024
+uint8_t src_buffer[DMA_BUFFER_SIZE];
+uint8_t dst_buffer[DMA_BUFFER_SIZE];
+
 void uart_init(void) {
     PIO4->CLR_PC0 = 1U; /* PC = 110, AFOUT, PP */
     PIO4->SET_PC1 = 1U;
@@ -35,25 +40,15 @@ void uart_init(void) {
     CONSOLE_ASC->CTRL     = 0x1589UL; /* 8N1, RX enable, FIFO enable, Baud mode 1 */
 }
 
-int main(void) {
-    init_led(LED_RED_GPIO, LED_RED_PIN, 0U);
-    init_led(LED_BLUE_GPIO, LED_BLUE_PIN, 0U);
-
-    setbuf(stdout, NULL);
-    setbuf(stderr, NULL);
-
-    uart_init();
-
-    printf("Hello world\r\n");
-
+static void configure_fdma0(void) {
     FDMA0->SLIM_CLK_GATE |= (FDMA_SLIM_CLK_GATE_DIS_Msk | FDMA_SLIM_CLK_GATE_RESET_Msk);
     FDMA0->PERIPH_STBUS_SYNC |= FDMA_PERIPH_STBUS_SYNC_DIS_Msk;
 
-    for(uint32_t i = 0; i < stx7105_fdma0_fw.text_size; i++) {
+    for (uint32_t i = 0; i < stx7105_fdma0_fw.text_size; i++) {
         FDMA0->SLIM_IMEM[i] = stx7105_fdma0_fw.text[i];
     }
 
-    for(uint32_t i = 0; i < stx7105_fdma0_fw.data_size; i++) {
+    for (uint32_t i = 0; i < stx7105_fdma0_fw.data_size; i++) {
         FDMA0->SLIM_DMEM[i] = stx7105_fdma0_fw.data[i];
     }
 
@@ -65,6 +60,53 @@ int main(void) {
 
     printf("FDMA0 SLIM ID: 0x%08lx\r\n", FDMA0->SLIM_ID);
     printf("FDMA0 SLIM Version: 0x%08lx\r\n", FDMA0->SLIM_VER);
+}
+
+static void configure_fdma1(void) {
+    FDMA1->SLIM_CLK_GATE |= (FDMA_SLIM_CLK_GATE_DIS_Msk | FDMA_SLIM_CLK_GATE_RESET_Msk);
+    FDMA1->PERIPH_STBUS_SYNC |= FDMA_PERIPH_STBUS_SYNC_DIS_Msk;
+
+    for (uint32_t i = 0; i < stx7105_fdma1_fw.text_size; i++) {
+        FDMA1->SLIM_IMEM[i] = stx7105_fdma1_fw.text[i];
+    }
+
+    for (uint32_t i = 0; i < stx7105_fdma1_fw.data_size; i++) {
+        FDMA1->SLIM_DMEM[i] = stx7105_fdma1_fw.data[i];
+    }
+
+    FDMA1->SLIM_CLK_GATE &= ~FDMA_SLIM_CLK_GATE_DIS_Msk;
+    FDMA1->PERIPH_INT_CLR = 0xFFFFFFFFU;
+    FDMA1->PERIPH_CMD_CLR = 0xFFFFFFFFU;
+
+    FDMA1->SLIM_EN |= FDMA_SLIM_EN_RUN_Msk;
+
+    printf("FDMA1 SLIM ID: 0x%08lx\r\n", FDMA1->SLIM_ID);
+    printf("FDMA1 SLIM Version: 0x%08lx\r\n", FDMA1->SLIM_VER);
+}
+
+int main(void) {
+    init_led(LED_RED_GPIO, LED_RED_PIN, 0U);
+    init_led(LED_BLUE_GPIO, LED_BLUE_PIN, 0U);
+
+    setbuf(stdout, NULL);
+    setbuf(stderr, NULL);
+
+    uart_init();
+
+    printf("Hello world\r\n");
+
+    printf("CKGA Opts 1: 0x%08lx\r\n", CKGA->CLKOPSRC_SWITCH_CFG);
+    printf("CKGA Opts 2: 0x%08lx\r\n", CKGA->CLKOPSRC_SWITCH_CFG2);
+
+    configure_fdma0();
+    configure_fdma1();
+
+    FDMA_FWRegs_TypeDef *fdma0_fwregs = (FDMA_FWRegs_TypeDef *)(FDMA0->SLIM_DMEM);
+
+    fdma0_fwregs->CHANNELN[0].CNTN = DMA_BUFFER_SIZE;
+    fdma0_fwregs->CHANNELN[0].SADDRN = src_buffer;
+    fdma0_fwregs->CHANNELN[0].DADDRN = dst_buffer;
+    fdma0_fwregs->REQ_CTLN[0] = 
 
     delay_ms(5000);
 

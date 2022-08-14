@@ -129,7 +129,7 @@ typedef struct {
     __IO uint32_t BDMRB;            /* Offset: 0x2001C, Break data mask register B */
     __IO uint16_t BRCR;             /* Offset: 0x20020, Break control register */
     uint8_t       UNUSED9[2];       /* Offset: 0x20022 */
-} CSR_TypeDef;
+} CSP_TypeDef;
 
 /* drivers/stm/stx7105.c */
 typedef struct {
@@ -154,39 +154,67 @@ typedef struct {
     __IO uint8_t  SLIM_IMEM[16384];  /* Offset: 0xC000, SLIM CPU instruction memory */
 } FDMA_TypeDef;
 
-#define PIO0_BASE  (0xFD020000U)
-#define PIO1_BASE  (0xFD021000U)
-#define PIO2_BASE  (0xFD022000U)
-#define PIO3_BASE  (0xFD023000U)
-#define PIO4_BASE  (0xFD024000U)
-#define PIO5_BASE  (0xFD025000U)
-#define PIO6_BASE  (0xFD026000U)
-#define ASC0_BASE  (0xFD030000U)
-#define ASC1_BASE  (0xFD031000U)
-#define ASC2_BASE  (0xFD032000U)
-#define ASC3_BASE  (0xFD033000U)
+/* WARNING: THE CLKGENA is different from other ST40s' */
+typedef struct {
+    __IO uint32_t PLL0_CFG;               /* Offset: 0x0000 */
+    __IO uint32_t PLL1_CFG;               /* Offset: 0x0004 */
+    uint32_t      UNUSED0[2];             /* Offset: 0x0008 */
+    __IO uint32_t POWER_CFG;              /* Offset: 0x0010 */
+    __IO uint32_t CLKOPSRC_SWITCH_CFG;    /* Offset: 0x0014 */
+    uint32_t      UNUSED1[4];             /* Offset: 0x0018 */
+    __IO uint32_t CLKOPSRC_SWITCH_CFG2;   /* Offset: 0x0024 */
+    uint32_t      UNUSED2[2];             /* Offset: 0x0028 */
+    __IO uint32_t CLKOBS_MUX1_CFG;        /* Offset: 0x0030 */
+    __IO uint32_t CLKOBS_MASTER_MAXCOUNT; /* Offset: 0x0034 */
+    __IO uint32_t CLKOBS_CMD;             /* Offset: 0x0038 */
+    __IO uint32_t CLKOBS_STATUS;          /* Offset: 0x003C */
+    __IO uint32_t CLKOBS_SLAVE0_COUNT;    /* Offset: 0x0040 */
+    __IO uint32_t OSCMUX_DEBUG;           /* Offset: 0x0044 */
+    __IO uint32_t CLKOBS_MUX2_CFG;        /* Offset: 0x0048 */
+    __IO uint32_t LOW_POWER_CTRL;         /* Offset: 0x004C */
+} CKGA_TypeDef;
+
+#define PIO0_BASE (0xFD020000U)
+#define PIO1_BASE (0xFD021000U)
+#define PIO2_BASE (0xFD022000U)
+#define PIO3_BASE (0xFD023000U)
+#define PIO4_BASE (0xFD024000U)
+#define PIO5_BASE (0xFD025000U)
+#define PIO6_BASE (0xFD026000U)
+
+#define ASC0_BASE (0xFD030000U)
+#define ASC1_BASE (0xFD031000U)
+#define ASC2_BASE (0xFD032000U)
+#define ASC3_BASE (0xFD033000U)
+
+#define CKGA_BASE  (0xFE213000U)
 #define FDMA0_BASE (0xFE220000U)
 #define FDMA1_BASE (0xFE410000U)
-#define CSR_BASE   (0xFF000000U)
-#define INTC_BASE  (0xFFD00000U)
-#define TMU_BASE   (0xFFD80000U)
 
-#define PIO0  ((PIO_TypeDef *)PIO0_BASE)
-#define PIO1  ((PIO_TypeDef *)PIO1_BASE)
-#define PIO2  ((PIO_TypeDef *)PIO2_BASE)
-#define PIO3  ((PIO_TypeDef *)PIO3_BASE)
-#define PIO4  ((PIO_TypeDef *)PIO4_BASE)
-#define PIO5  ((PIO_TypeDef *)PIO5_BASE)
-#define PIO6  ((PIO_TypeDef *)PIO6_BASE)
-#define ASC0  ((ASC_TypeDef *)ASC0_BASE)
-#define ASC1  ((ASC_TypeDef *)ASC1_BASE)
-#define ASC2  ((ASC_TypeDef *)ASC2_BASE)
-#define ASC3  ((ASC_TypeDef *)ASC3_BASE)
-#define CSR   ((CSR_TypeDef *)CSR_BASE)
+#define CSP_BASE  (0xFF000000U)
+#define INTC_BASE (0xFFD00000U)
+#define TMU_BASE  (0xFFD80000U)
+
+#define PIO0 ((PIO_TypeDef *)PIO0_BASE)
+#define PIO1 ((PIO_TypeDef *)PIO1_BASE)
+#define PIO2 ((PIO_TypeDef *)PIO2_BASE)
+#define PIO3 ((PIO_TypeDef *)PIO3_BASE)
+#define PIO4 ((PIO_TypeDef *)PIO4_BASE)
+#define PIO5 ((PIO_TypeDef *)PIO5_BASE)
+#define PIO6 ((PIO_TypeDef *)PIO6_BASE)
+
+#define ASC0 ((ASC_TypeDef *)ASC0_BASE)
+#define ASC1 ((ASC_TypeDef *)ASC1_BASE)
+#define ASC2 ((ASC_TypeDef *)ASC2_BASE)
+#define ASC3 ((ASC_TypeDef *)ASC3_BASE)
+
+#define CKGA  ((CKGA_TypeDef *)CKGA_BASE)
 #define FDMA0 ((FDMA_TypeDef *)FDMA0_BASE)
 #define FDMA1 ((FDMA_TypeDef *)FDMA1_BASE)
-#define INTC  ((INTC_TypeDef *)INTC_BASE)
-#define TMU   ((TMU_TypeDef *)TMU_BASE)
+
+#define CSP  ((CSP_TypeDef *)CSP_BASE)
+#define INTC ((INTC_TypeDef *)INTC_BASE)
+#define TMU  ((TMU_TypeDef *)TMU_BASE)
 
 #define TMU_TSTR_STR0_Pos 0
 #define TMU_TSTR_STR0_Msk (1U << TMU_TSTR_STR0_Pos)
