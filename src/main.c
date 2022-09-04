@@ -21,9 +21,8 @@
 #define MEMTEST_START 0x82000000
 #define MEMTEST_END   0x8F000000
 
-#define DMA_BUFFER_SIZE 1024
+#define DMA_BUFFER_SIZE 16
 uint8_t src_buffer[DMA_BUFFER_SIZE];
-uint8_t dst_buffer[DMA_BUFFER_SIZE];
 
 void uart_init(void) {
     PIO4->CLR_PC0 = 1U; /* PC = 110, AFOUT, PP */
@@ -103,10 +102,14 @@ int main(void) {
 
     FDMA_FWRegs_TypeDef *fdma0_fwregs = (FDMA_FWRegs_TypeDef *)(FDMA0->SLIM_DMEM);
 
-    fdma0_fwregs->CHANNELN[0].CNTN = DMA_BUFFER_SIZE;
-    fdma0_fwregs->CHANNELN[0].SADDRN = src_buffer;
-    fdma0_fwregs->CHANNELN[0].DADDRN = dst_buffer;
-    fdma0_fwregs->REQ_CTLN[0] = 
+    fdma0_fwregs->CHANNEL[0].NEXT   = (uint32_t)NULL;
+    fdma0_fwregs->CHANNEL[0].NBYTES = DMA_BUFFER_SIZE;
+    fdma0_fwregs->CHANNEL[0].LENGTH = DMA_BUFFER_SIZE;
+    fdma0_fwregs->CHANNEL[0].SADDR  = (uint32_t)src_buffer;
+    fdma0_fwregs->CHANNEL[0].DADDR  = CONSOLE_ASC->TX_BUF;
+    fdma0_fwregs->CHANNEL[0].S_STRIDE = 0U;
+    fdma0_fwregs->CHANNEL[0].D_STRIDE = 0U;
+    fdma0_fwregs->REQ_CTRL[0]       = (1U << FDMA_FwRegs_REQ_CTLN_NUM_OPS_Pos) | FDMA_FwRegs_REQ_CTLN_INC_ADDR_Msk;
 
     delay_ms(5000);
 

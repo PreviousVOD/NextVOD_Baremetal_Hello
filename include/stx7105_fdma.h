@@ -25,21 +25,24 @@ typedef enum {
 } FDMA_ReqCtl_Opcode_TypeDef;
 
 typedef struct {
-    __IO uint32_t PTRN;    /* Offset: 0x0000 */
-    uint32_t      UNUSED2; /* Offset: 0x0004 */
-    __IO uint32_t CNTN;    /* Offset: 0x0008 */
-    __IO uint32_t SADDRN;  /* Offset: 0x000C */
-    __IO uint32_t DADDRN;  /* Offset: 0x0010 */
+    __IO uint32_t NEXT;     /* Offset: 0x0000, Next node in the list */
+    __IO uint32_t CTRL;     /* Offset: 0x0004, Control register */
+    __IO uint32_t NBYTES;   /* Offset: 0x0008, Number of bytes */
+    __IO uint32_t SADDR;    /* Offset: 0x000C, Source address */
+    __IO uint32_t DADDR;    /* Offset: 0x0010, Destination address */
+    __IO uint32_t LENGTH;   /* Offset: 0x0014, Burst length */
+    __IO uint32_t S_STRIDE; /* Offset: 0x0018, Source stride */
+    __IO uint32_t D_STRIDE; /* Offset: 0x001C, Destination stride */
 } FDMA_FwRegs_Channel_TypeDef;
 
 /* Firmware regs, implemented on the base of DMEM */
 typedef struct {
     __IO uint32_t               REVID;         /* Offset: 0x8000 */
     uint32_t                    UNUSED0[1103]; /* Offset: 0x8004 */
-    __IO uint32_t               CMD_STATN[16]; /* Offset: 0x9140 */
-    __IO uint32_t               REQ_CTLN[16];  /* Offset: 0x9180 */
+    __IO uint32_t               CMD_STAT[16];  /* Offset: 0x9140 */
+    __IO uint32_t               REQ_CTRL[16];  /* Offset: 0x9180 */
     uint32_t                    UNUSED1[240];  /* Offset: 0x91C0 */
-    FDMA_FwRegs_Channel_TypeDef CHANNELN[16];  /* Offset: 0x9580 */
+    FDMA_FwRegs_Channel_TypeDef CHANNEL[16];   /* Offset: 0x9580 */
 } FDMA_FWRegs_TypeDef;
 
 #define FDMA_FwRegs_REQ_CTLN_HOLDOFF_Pos 0U
