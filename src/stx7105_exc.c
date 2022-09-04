@@ -30,7 +30,7 @@ __WEAK int syscall_handler(uint32_t p1, uint32_t p2, uint32_t p3, uint32_t p4) {
 }
 
 __WEAK int trap_handler(uint32_t p1, uint32_t p2, uint32_t p3, uint32_t p4) {
-    tra_type_t tra = CSR->TRA;
+    tra_type_t tra = CSP->TRA;
 
     switch (tra) {
         case TRA_TYPE_SYSCALL:
@@ -44,7 +44,7 @@ __WEAK int trap_handler(uint32_t p1, uint32_t p2, uint32_t p3, uint32_t p4) {
 }
 
 __WEAK_IRQ int general_exc_handler(uint32_t p1, uint32_t p2, uint32_t p3, uint32_t p4) {
-    expevt_type_t expevt = CSR->EXPEVT;
+    expevt_type_t expevt = CSP->EXPEVT;
     switch (expevt) {
         case EXP_TYPE_TRAP:
             return trap_handler(p1, p2, p3, p4);
@@ -57,7 +57,7 @@ __WEAK_IRQ int general_exc_handler(uint32_t p1, uint32_t p2, uint32_t p3, uint32
 }
 
 __WEAK_IRQ int general_int_handler(void) {
-    intevt_type_t intevt = CSR->INTEVT;
+    intevt_type_t intevt = CSP->INTEVT;
     switch (intevt) {
         case INT_TYPE_TMU_TNUI0:
             return tuni0_handler();
