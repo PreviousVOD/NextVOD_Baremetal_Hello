@@ -7,13 +7,17 @@ ENTRY(_start)
 /* We don't use 29-bit mode since PMB and LMI initialization has to be done anyway. */
 
 MEMORY {
-    EMI  (rx) : ORIGIN = 0x80000000, LENGTH = 0x01000000 /* LMI virtual address: 0x8000_0000 */
-    LMI (rwx) : ORIGIN = 0x81000000, LENGTH = 0x0F000000 /* LMI virtual address: 0x8100_0000 */
+    EMI         (rx)  : ORIGIN = 0x80000000, LENGTH = 0x01000000 /* EMI copied to Non-cached LMI virtual address: 0x8000_0000 */
+    LMI        (rwx)  : ORIGIN = 0x81000000, LENGTH = 0x0F000000 /*               Non-cached LMI virtual address: 0x8100_0000 */
+    EMI_CACHED  (rx)  : ORIGIN = 0x90000000, LENGTH = 0x01000000 /*     EMI copied to cached LMI virtual address: 0x9000_0000 */
+    LMI_CACHED (rwx)  : ORIGIN = 0x91000000, LENGTH = 0x0F000000 /*                   Cached LMI virtual address: 0x9100_0000 */
+
 }
 
 SECTIONS {
     .text : {
         . = ALIGN(4);
+        _stext = .;
         KEEP(*(.text.vtors))
         *(.text.init)
         *(.text.exc)

@@ -7,6 +7,7 @@
 
     .section .text.vtors, "ax"
 _vtors:
+    .long _stext
     .long _eidata
     .long _start
 
