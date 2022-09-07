@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 
-#define  __trapa(code)  asm volatile("trapa %0" :: "i" (code))
+#define __trapa(code) asm volatile("trapa %0" ::"i"(code))
+#define __sleep()     asm volatile("sleep")
 
 #endif  // SH4_CORE_H

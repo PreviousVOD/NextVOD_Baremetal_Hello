@@ -40,7 +40,7 @@ void delay_ms(uint32_t msec) {
 
     /* Wait until underflow occurs */
     while (s_tmu_flag != 1) {
-        asm("sleep");
+        __sleep();
     }
 
     s_tmu_flag = 0U;

@@ -5,7 +5,9 @@
 #define WEAK_IRQ_ATTR __attribute__((weak, interrupt_handler))
 
 typedef enum {
-    EXP_TYPE_TRAP = 0x160,
+    EXP_TYPE_RADDERR = 0x0E0,
+    EXP_TYPE_WADDERR = 0x100,
+    EXP_TYPE_TRAP    = 0x160,
 } expevt_type_t;
 
 typedef enum {
@@ -20,7 +22,9 @@ typedef enum {
 } intevt_type_t;
 
 typedef enum {
-    TRA_TYPE_SYSCALL = 34,
+    TRA_TYPE_START_SCHEDULER = 32,
+    TRA_TYPE_YIELD           = 33,
+    TRA_TYPE_SYSCALL         = 34,
 } tra_type_t;
 
 /* ========================= TMU 0/1/2 Underrun Interrupt Handlers =================================  */
@@ -39,13 +43,29 @@ WEAK_ATTR void tuni2_handler(void) {
 
 /* ========================= ASC(UART) 0/1/2 Interrupt Handlers =================================  */
 
+WEAK_ATTR void asc0_handler(void) {
+    /* Does nothing */
+}
+
+WEAK_ATTR void asc1_handler(void) {
+    /* Does nothing */
+}
+
 WEAK_ATTR void asc2_handler(void) {
+    /* Does nothing */
+}
+
+WEAK_ATTR void asc3_handler(void) {
     /* Does nothing */
 }
 
 /* ========================= Different Trap Code Handlers =================================  */
 
 WEAK_ATTR void syscall_handler(uint32_t p1, uint32_t p2, uint32_t p3, uint32_t p4) {
+    /* Does nothing */
+}
+
+WEAK_ATTR void yield_handler(uint32_t p1, uint32_t p2, uint32_t p3, uint32_t p4) {
     /* Does nothing */
 }
 
@@ -58,8 +78,27 @@ WEAK_ATTR void trap_handler(uint32_t p1, uint32_t p2, uint32_t p3, uint32_t p4) 
         case TRA_TYPE_SYSCALL:
             syscall_handler(p1, p2, p3, p4);
             break;
+        case TRA_TYPE_YIELD:
+            yield_handler(p1, p2, p3, p4);
+            break;
         default:
             break;
+    }
+}
+
+/* ========================= Address Error Exception Handlers =================================  */
+
+WEAK_ATTR void radderr_handler(void) {
+    /* Dead... */
+    for (;;) {
+        /* Loop... */
+    }
+}
+
+WEAK_ATTR void wadderr_handler(void) {
+    /* Dead... */
+    for (;;) {
+        /* Loop... */
     }
 }
 
@@ -70,6 +109,12 @@ WEAK_IRQ_ATTR void general_exc_handler(uint32_t p1, uint32_t p2, uint32_t p3, ui
     switch (expevt) {
         case EXP_TYPE_TRAP:
             trap_handler(p1, p2, p3, p4);
+            break;
+        case EXP_TYPE_RADDERR:
+            radderr_handler();
+            break;
+        case EXP_TYPE_WADDERR:
+            wadderr_handler();
             break;
         default:
             break;
@@ -90,8 +135,17 @@ WEAK_IRQ_ATTR void general_int_handler(void) {
         case INT_TYPE_TMU_TNUI2:
             tuni2_handler();
             break;
+        case INT_TYPE_ASC_UART0:
+            asc0_handler();
+            break;
+        case INT_TYPE_ASC_UART1:
+            asc1_handler();
+            break;
         case INT_TYPE_ASC_UART2:
             asc2_handler();
+            break;
+        case INT_TYPE_ASC_UART3:
+            asc3_handler();
             break;
         default:
             break;
