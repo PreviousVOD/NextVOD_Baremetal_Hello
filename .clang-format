@@ -1,8 +1,8 @@
 BasedOnStyle: Google
 IndentWidth: 4
 AlignConsecutiveMacros: AcrossEmptyLines
-AlignConsecutiveDeclarations: AcrossEmptyLines
-AlignConsecutiveAssignments: AcrossEmptyLinesAndComments
+AlignConsecutiveDeclarations: Consecutive
+AlignConsecutiveAssignments: Consecutive
 AllowShortFunctionsOnASingleLine: None
 BreakBeforeBraces: Custom
 BraceWrapping:

@@ -5,7 +5,7 @@
 
 #define CONSOLE_ASC ASC2
 
-#define HEAP_SIZE 0x10000
+#define HEAP_SIZE   0x10000
 
 extern char     _end;
 static uint32_t s_heap_size = 0U;
@@ -35,9 +35,8 @@ int _write(int file, char *ptr, int len) {
 }
 
 int _open(const char *name, int flags, int mode) {
-  return -1;
+    return -1;
 }
-
 
 int _read(int file, char *ptr, int len) {
     return 0;

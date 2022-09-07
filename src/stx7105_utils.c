@@ -39,7 +39,7 @@ void delay_ms(uint32_t msec) {
     INTC->IPRA |= (1U << INTC_IPRA_IPR_TMU0_Pos); /* Interrupt priority 1 */
 
     /* Wait until underflow occurs */
-    while(s_tmu_flag != 1) {
+    while (s_tmu_flag != 1) {
         asm("sleep");
     }
 
@@ -48,9 +48,7 @@ void delay_ms(uint32_t msec) {
     TMU->TSTR &= ~TMU_TSTR_STR0_Msk; /* Stop counter */
 }
 
-int tuni0_handler(void) {
+void tuni0_handler(void) {
     s_tmu_flag = 1U;
     TMU->TCR0 &= ~(TMU_TCR_UNF_Msk);
-
-    return 0;
 }

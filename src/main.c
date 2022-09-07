@@ -4,19 +4,19 @@
 #include "stx7105.h"
 #include "stx7105_utils.h"
 
-#define LED_RED_GPIO PIO0
-#define LED_RED_PIN  5U
+#define LED_RED_GPIO    PIO0
+#define LED_RED_PIN     5U
 
-#define LED_BLUE_GPIO PIO0
-#define LED_BLUE_PIN  4U
+#define LED_BLUE_GPIO   PIO0
+#define LED_BLUE_PIN    4U
 
 #define CONSOLE_ASC     ASC2
 #define SYSTEM_DEVID    (0xFE001000U) /* DEVID */
 #define SYSTEM_CONFIG34 (0xFE001188U) /* PIO4 */
 #define SYSTEM_CONFIG7  (0xFE00111CU) /* RXSEL */
 
-#define MEMTEST_START 0x82000000
-#define MEMTEST_END   0x8F000000
+#define MEMTEST_START   0x82000000
+#define MEMTEST_END     0x8F000000
 
 void uart_init(void) {
     PIO4->CLR_PC0 = 1U; /* PC = 110, AFOUT, PP */
@@ -63,8 +63,8 @@ int main(void) {
     init_led(LED_RED_GPIO, LED_RED_PIN, 0U);
     init_led(LED_BLUE_GPIO, LED_BLUE_PIN, 0U);
 
-    setbuf(stdout,NULL);
-    setbuf(stderr,NULL);
+    setbuf(stdout, NULL);
+    setbuf(stderr, NULL);
 
     uart_init();
 
