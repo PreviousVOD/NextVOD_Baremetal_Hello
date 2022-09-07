@@ -34,10 +34,12 @@ void uart_init(void) {
 }
 
 static void memory_test(void) {
+    printf("Begin memory test from 0x%08x to 0x%08x\r\n", MEMTEST_START, MEMTEST_END);
+
     for (uint32_t i = MEMTEST_START; i < MEMTEST_END; i += 4) {
         *(uint32_t *)i = i;
 
-        if (i % 0x10000 == 0U) {
+        if (i % 0x100000 == 0U) {
             printf("Write to 0x%08lx...\r\n", i);
         }
     }
@@ -49,10 +51,12 @@ static void memory_test(void) {
             return;
         }
 
-        if (i % 0x10000 == 0U) {
+        if (i % 0x100000 == 0U) {
             printf("Read from 0x%08lx...\r\n", i);
         }
     }
+
+    printf("Memory test finished.\r\n");
 }
 
 int main(void) {
@@ -66,16 +70,7 @@ int main(void) {
 
     printf("Hello world\r\n");
 
-    printf("Size of int: %d\r\n", sizeof(int));
-    printf("Size of short: %d\r\n", sizeof(short));
-    printf("Size of char: %d\r\n", sizeof(char));
-    printf("Size of long: %d\r\n", sizeof(long));
-    printf("Size of pointer: %d\r\n", sizeof(uint8_t *));
-    printf("Size of uint8_t: %d\r\n", sizeof(uint8_t));
-    printf("Size of uint16_t: %d\r\n", sizeof(uint16_t));
-    printf("Size of uint32_t: %d\r\n", sizeof(uint32_t));
-
-    delay_ms(5000);
+    __trapa(34); /* TRAPA test code.. */
 
     memory_test();
 
@@ -86,5 +81,11 @@ int main(void) {
         delay_ms(500);
     }
 
+    return 0;
+}
+
+/* tra #34 is SysCall.. */
+int syscall_handler(uint32_t p1, uint32_t p2, uint32_t p3, uint32_t p4) {
+    set_led(LED_RED_GPIO, LED_RED_PIN, 1U);
     return 0;
 }

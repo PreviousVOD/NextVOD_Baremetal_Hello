@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+#include "sh4_core.h"
+
 #define __PACKED __attribute__((packed, aligned(1)))
 #define __IO     volatile
 
